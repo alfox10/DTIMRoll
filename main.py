@@ -18,7 +18,7 @@ async def randomize(message):
     if len(splitSpace) == 2:
         reg = re.search('[0-9]+d[0-9]+((\+|\-)[0-9]+){0,1}', str(splitSpace[1]))
         if not reg:
-          await message.channel.send("```Testo non valido```")
+          await message.channel.send("```Stai tirando un cetriolo?```")
           return
         diceData = str(splitSpace[1]).split("d")
         if len(diceData) == 2:
