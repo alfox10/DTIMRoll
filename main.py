@@ -1,6 +1,7 @@
 import discord
 import os
 import random
+from wserver import keep_alive
 
 client = discord.Client()
 
@@ -48,5 +49,5 @@ async def on_message(message):
   if message.content.startswith('/roll'):
     await randomize(message)
         
-
+keep_alive()
 client.run(os.getenv('TOKEN'))
