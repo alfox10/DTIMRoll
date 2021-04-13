@@ -13,9 +13,11 @@ async def usage(channel):
 
 
 async def readCommand(command, channel):
+    # divide dice commands
     diceList = command.split(" ")
     if len(diceList) > 0:
         for i in len(diceList):
+            # print dice throw results
             channel.send(throwDices(diceList[i]))
     else:
         await usage(channel)
