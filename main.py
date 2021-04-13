@@ -32,29 +32,44 @@ async def throwDices(dice):
     diceData = dice.split("d")[1]
     result = ""
     for i in range(int(diceCount)):
+        # additive modifier
         if "+" in diceData:
+            # dice data parsing
             diceValue = diceData.split("-")[0]
             diceModifier = diceData.split("+")[1]
+            # dice throw
             baseValue = random.randint(1, int(diceValue))
             finalValue = baseValue + int(diceModifier)
+            # value limiter
             if finalValue > diceValue:
                 finalValue = diceValue
+            # emoji addition
             if finalValue >= diceValue:
                 finalValue = str(finalValue) + ":tada:"
             result += str(finalValue) + " (" + str(baseValue) + ")\t"
+        # subtractive modifier
         elif "-" in diceData:
+            # dice data parsing
             diceValue = diceData.split("-")[0]
             diceModifier = diceData.split("-")[1]
+            # dice throw
             baseValue = random.randint(1, int(diceValue))
             finalValue = baseValue + int(diceModifier)
+            # value limiter
             if finalValue < 1:
                 finalValue = 1
+            # emoji addition
             if finalValue == 1:
                 finalValue = str(finalValue) + ":skull:"
             result += str(finalValue) + " (" + str(baseValue) + ")\t"
+        # no modifier
         else:
-            baseValue = random.randint(1, int(diceData[0]))
+            # dice data parsing
+            diceValue = diceData.split("-")[0]
+            # dice throw
+            baseValue = random.randint(1, int(diceValue))
             finalValue = baseValue
+            # emoji addition
             if finalValue == 1:
                 finalValue = str(finalValue) + ":skull:"
             if finalValue >= diceValue:
