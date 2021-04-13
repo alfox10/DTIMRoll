@@ -2,6 +2,7 @@ import discord
 import os
 import random
 from wserver import keep_alive
+import re
 
 client = discord.Client()
 
@@ -15,6 +16,10 @@ async def randomize(message):
     userText = message.content
     splitSpace = userText.split(" ", 1)
     if len(splitSpace) == 2:
+        reg = re.search('[0-9]+d[0-9]+((\+|\-)[0-9]+){0,1}', str(splitSpace[1]))
+        if not reg:
+          await message.channel.send("```Testo non valido```")
+          return
         diceData = str(splitSpace[1]).split("d")
         if len(diceData) == 2:
           result = ""
