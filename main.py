@@ -91,7 +91,7 @@ async def on_message(message):
         return
 
     if message.content.startswith('/roll '):
-        cleanMessage = message.content.substr(0, 5)
+        cleanMessage = message.content[0:5]
         await readCommand(cleanMessage, message.channel)
 
 
