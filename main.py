@@ -28,7 +28,7 @@ def throwDices(dice):
     # command validation
     if not reg:
         # invalid dice, cucumber thrown!
-        return "```Stai tirando un cetriolo? :cucumber:```"
+        return "Stai tirando un cetriolo? :cucumber:"
 
     diceCount = dice.split("d")[0]
     diceData = dice.split("d")[1]
@@ -77,7 +77,7 @@ def throwDices(dice):
             if finalValue >= diceValue:
                 finalValue = str(finalValue) + ":tada:"
             result += finalValue + "\t"
-    return "``` d" + diceData + ": " + result + "```"
+    return "d" + diceData + ": " + result + ""
 
 
 @client.event
