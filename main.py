@@ -7,44 +7,60 @@ import re
 client = discord.Client()
 
 
-async def usage(message):
+async def usage(channel):
     usage = "```COME USARE IL TOOL\n\t/roll xdY\n\tx e' uguale al numero di dadi che si vuole lanciare\n\tY e' uguale alle facce del dado da lanciare\n\tEsempio:\n\t/roll 3d6\n\tlancia 3 dadi da 6 facce\n\tOpzionale\n\te' possibile aggiungere un modificatore ad ogni lancio attraverso\n\tsimboli matematici + (addizione) e - (sottrazione)\n\tEsempio\n\t/roll 2d10-1\n\tlancia 2 dadi da 10 facce e sottrai ad ogni risultato 1\n```"
-    await message.channel.send(usage)
+    await channel.send(usage)
 
 
-async def randomize(message):
-    userText = message.content
-    splitSpace = userText.split(" ", 1)
-    if len(splitSpace) == 2:
-        reg = re.search('[0-9]+d[0-9]+((\+|\-)[0-9]+){0,1}', str(splitSpace[1]))
-        if not reg:
-          await message.channel.send("```Stai tirando un cetriolo?```")
-          return
-        diceData = str(splitSpace[1]).split("d")
-        if len(diceData) == 2:
-          result = ""
-          for i in range(int(diceData[0].strip())):
-            if "+" in diceData[1]:
-                diceValues = str(diceData[1]).split("+")
-                x = random.randint(1, int(diceValues[0].strip()))
-                sum = x + int(diceValues[1].strip())
-                result += str(x) + " + " + str(diceValues[1]) + " = " + str(sum)+"\n"
-            elif "-" in diceData[1]:
-              diceValues = str(diceData[1]).split("-")
-              x = random.randint(1, int(diceValues[0].strip()))
-              sum = x - int(diceValues[1])
-              result +=str(x) + " - " + str(diceValues[1]) + " = " + str(sum)+"\n"
-            elif diceData[1].strip().isdecimal():
-              x = random.randint(1, int(diceData[1].strip()))
-              result += str(x)+"\t"
-            else:
-              await usage(message)
-              break
-          await message.channel.send("```"+result+"```")
-        else:
-            await usage(message)
+async def readCommand(command, channel):
+    diceList = command.split(" ")
+    if len(diceList) > 0:
+        for i in len(diceList):
+            channel.send(throwDices(diceList[i]))
     else:
-        await usage(message)
+        await usage(channel)
+
+
+async def throwDices(dice):
+    reg = re.search('[0-9]+d[0-9]+((\+|\-)[0-9]+){0,1}', str(dice))
+    # command validation
+    if not reg:
+        # invalid dice, cucumber thrown!
+        return "```Stai tirando un cetriolo? :cucumber:```"
+
+    diceCount = dice.split("d")[0]
+    diceData = dice.split("d")[1]
+    result = ""
+    for i in range(int(diceCount)):
+        if "+" in diceData:
+            diceValue = diceData.split("-")[0]
+            diceModifier = diceData.split("+")[1]
+            baseValue = random.randint(1, int(diceValue))
+            finalValue = baseValue + int(diceModifier)
+            if finalValue > diceValue:
+                finalValue = diceValue
+            if finalValue >= diceValue:
+                finalValue = str(finalValue) + ":tada:"
+            result += str(finalValue) + " (" + str(baseValue) + ")\t"
+        elif "-" in diceData:
+            diceValue = diceData.split("-")[0]
+            diceModifier = diceData.split("-")[1]
+            baseValue = random.randint(1, int(diceValue))
+            finalValue = baseValue + int(diceModifier)
+            if finalValue < 1:
+                finalValue = 1
+            if finalValue == 1:
+                finalValue = str(finalValue) + ":skull:"
+            result += str(finalValue) + " (" + str(baseValue) + ")\t"
+        else:
+            baseValue = random.randint(1, int(diceData[0]))
+            finalValue = baseValue
+            if finalValue == 1:
+                finalValue = str(finalValue) + ":skull:"
+            if finalValue >= diceValue:
+                finalValue = str(finalValue) + ":tada:"
+            result += finalValue + "\t"
+    return "``` d" + diceData + ": " + result + "```"
 
 
 @client.event
@@ -57,8 +73,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('/roll'):
-        await randomize(message)
+    if message.content.startswith('/roll '):
+        cleanMessage = message.content.substr(0, 5)
+        await readCommand(cleanMessage, message.channel)
 
 
 keep_alive()
