@@ -23,6 +23,17 @@ async def readCommand(command, channel):
         await usage(channel)
 
 
+def validateDiceCommand(count, data):
+    if int(count) == 0:
+        # invalid dice count
+        return "Scusa, non tiro!"
+    if int(data.split("+")[0].split("-")[0]) == 0:
+        return "Nessuno sa dove sia il leggendario d0..."
+    if int(data.split("+")[0].split("-")[0]) == 1:
+        return "Come si tira un punto?!"
+    return None
+
+
 def throwDices(dice):
     reg = re.search('[0-9]+d[0-9]+((\+|\-)[0-9]+){0,1}', str(dice))
     # command validation
@@ -32,27 +43,32 @@ def throwDices(dice):
 
     diceCount = dice.split("d")[0]
     diceData = dice.split("d")[1]
+
+    validation = validateDiceCommand(diceCount, diceData)
+    if validation is not None:
+        return validation
+
     result = ""
     for i in range(int(diceCount)):
+        # dice data parsing
+        diceValue = diceData.split("-")[0]
+        diceValue = diceValue.split("+")[0]
+
         # additive modifier
         if "+" in diceData:
-            # dice data parsing
-            diceValue = diceData.split("-")[0]
-            diceModifier = diceData.split("+")[1]
+            diceModifier = diceModifier.split("+")[1]
             # dice throw
             baseValue = random.randint(1, int(diceValue))
             finalValue = baseValue + int(diceModifier)
             # value limiter
-            if finalValue > diceValue:
-                finalValue = diceValue
+            if finalValue > int(diceValue):
+                finalValue = int(diceValue)
             # emoji addition
-            if finalValue >= diceValue:
-                finalValue = str(finalValue) + ":tada:"
+            # if finalValue == int(diceValue):
+            #     finalValue = str(finalValue) + " :tada:"
             result += str(finalValue) + " (" + str(baseValue) + ")\t"
         # subtractive modifier
         elif "-" in diceData:
-            # dice data parsing
-            diceValue = diceData.split("-")[0]
             diceModifier = diceData.split("-")[1]
             # dice throw
             baseValue = random.randint(1, int(diceValue))
@@ -61,23 +77,21 @@ def throwDices(dice):
             if finalValue < 1:
                 finalValue = 1
             # emoji addition
-            if finalValue == 1:
-                finalValue = str(finalValue) + ":skull:"
+            # if finalValue == 1:
+            #     finalValue = str(finalValue) + " :skull:"
             result += str(finalValue) + " (" + str(baseValue) + ")\t"
         # no modifier
         else:
-            # dice data parsing
-            diceValue = diceData.split("-")[0]
             # dice throw
-            baseValue = random.randint(1, int(diceValue))
+            baseValue = random.randint(1, int(diceData))
             finalValue = baseValue
             # emoji addition
-            if finalValue == 1:
-                finalValue = str(finalValue) + ":skull:"
-            if finalValue >= diceValue:
-                finalValue = str(finalValue) + ":tada:"
-            result += finalValue + "\t"
-    return "d" + diceData + ": " + result + ""
+            # if baseValue == 1:
+            #     finalValue = str(baseValue) + " :skull:"
+            # if baseValue == int(diceValue):
+            #     finalValue = str(baseValue) + " :tada:"
+            result += str(finalValue) + "\t"
+    return "```d" + diceData + ":   " + result + "```"
 
 
 @client.event
