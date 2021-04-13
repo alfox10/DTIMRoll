@@ -5,7 +5,7 @@ import random
 client = discord.Client()
 
 async def usage(message):
-  usage = "COME USARE IL TOOL\n\t/roll xdY\n\tx e' uguale al numero di dadi che si vuole lanciare\n\tY e' uguale alle facce del dado da lanciare\n\tEsempio:\n\t/roll 3d6\n\tlancia 3 dadi da 6 facce\n\tOpzionale\n\te' possibile aggiungere un modificatore ad ogni lancio attraverso\n\tsimboli matematici + (addizione) e - (sottrazione)\n\tEsempio\n\t/roll 2d10-1\n\tlancia 2 dadi da 10 facce e sottrai ad ogni risultato 1\n"
+  usage = "```COME USARE IL TOOL\n\t/roll xdY\n\tx e' uguale al numero di dadi che si vuole lanciare\n\tY e' uguale alle facce del dado da lanciare\n\tEsempio:\n\t/roll 3d6\n\tlancia 3 dadi da 6 facce\n\tOpzionale\n\te' possibile aggiungere un modificatore ad ogni lancio attraverso\n\tsimboli matematici + (addizione) e - (sottrazione)\n\tEsempio\n\t/roll 2d10-1\n\tlancia 2 dadi da 10 facce e sottrai ad ogni risultato 1\n```"
   await message.channel.send(usage)
 	
 async def randomize(message):
