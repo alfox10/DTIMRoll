@@ -16,14 +16,14 @@ async def readCommand(command, channel):
     # divide dice commands
     diceList = command.split(" ")
     if len(diceList) > 0:
-        for i in len(diceList):
+        for i in range(len(diceList)):
             # print dice throw results
-            channel.send(throwDices(diceList[i]))
+            await channel.send(throwDices(diceList[i]))
     else:
         await usage(channel)
 
 
-async def throwDices(dice):
+def throwDices(dice):
     reg = re.search('[0-9]+d[0-9]+((\+|\-)[0-9]+){0,1}', str(dice))
     # command validation
     if not reg:
