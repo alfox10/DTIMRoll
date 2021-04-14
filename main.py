@@ -56,7 +56,7 @@ def throwDices(dice):
 
         # additive modifier
         if "+" in diceData:
-            diceModifier = diceModifier.split("+")[1]
+            diceModifier = diceData.split("+")[1]
             # dice throw
             baseValue = random.randint(1, int(diceValue))
             finalValue = baseValue + int(diceModifier)
