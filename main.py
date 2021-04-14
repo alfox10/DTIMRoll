@@ -72,7 +72,7 @@ def throwDices(dice):
             diceModifier = diceData.split("-")[1]
             # dice throw
             baseValue = random.randint(1, int(diceValue))
-            finalValue = baseValue + int(diceModifier)
+            finalValue = baseValue - int(diceModifier)
             # value limiter
             if finalValue < 1:
                 finalValue = 1
