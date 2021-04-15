@@ -96,6 +96,18 @@ def throwDices(dice):
             result += str(finalValue) + "\t"
     return str(author)+" ```d" + diceData + ":   " + result + "```"
 
+async def reroll(message):
+  global author
+  author = "<@" + str(message.author.id) + ">"
+  async for m in message.channel.history(limit=20):
+    if m.author == message.author:
+        if m.content.startswith('/roll'):
+          cleanMessage = m.content[6:]
+          await readCommand(cleanMessage, m.channel)
+          break
+  await message.channel.send(str(author)+" Non riesco a recuperare i tuoi tiri, usa /roll per questa volta")
+
+  
 
 @client.event
 async def on_ready():
@@ -107,9 +119,13 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if message.content == '/reroll':
+        await reroll(message)
+        return
+
     if message.content.startswith('/roll '):
         global author
-        author = message.author
+        author = "<@" + str(message.author.id) + ">"
         cleanMessage = message.content[6:]
         await readCommand(cleanMessage, message.channel)
 
