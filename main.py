@@ -22,7 +22,7 @@ async def readRollCommand(command, channel):
         message = author
         for i in range(len(diceList)):
             # print dice throw results
-            message += "\n" + throwDices(diceList[i])
+            message += throwDices(diceList[i])
         await channel.send(message)
     else:
         await usage(channel)
@@ -104,14 +104,18 @@ async def reroll(message):
 
 
 async def readTossCommand(command, channel):
-    message = channel.send(str(author))
-    message += "\n" + tossCoins(command)
+    global author
+    message = author
+    message += tossCoins(command)
     await channel.send(message)
 
 
 def tossCoins(coin):
     result = ""
-    for i in range(int(coin)):
+    coinCount = coin
+    if coinCount == "":
+        coinCount = "1"
+    for i in range(int(coinCount)):
         toss = random.randint(1, 2)
         if toss == 1:
             result += "testa" + "\t"
