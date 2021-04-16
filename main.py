@@ -39,13 +39,15 @@ def validateDiceCommand(count, data):
 
 def throwDices(dice):
     global author
-    reg = re.search('[0-9]+(d|D)[0-9]+((\+|\-)[0-9]+){0,1}', str(dice))
+    reg = re.search('[0-9]*(d|D)[0-9]+((\+|\-)[0-9]+){0,1}', str(dice))
     # command validation
     if not reg:
         # invalid dice, cucumber thrown!
         return str(author)+" Stai tirando un cetriolo? :cucumber:"
 
     diceCount = dice.split("d")[0]
+    if diceCount == "":
+        diceCount = "1"
     diceData = dice.split("d")[1]
 
     validation = validateDiceCommand(diceCount, diceData)
