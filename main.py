@@ -15,13 +15,15 @@ async def usage(channel):
 
 
 async def readRollCommand(command, channel):
+    global author
     # divide dice commands
     diceList = command.split(" ")
     if len(diceList) > 0:
-        await channel.send(str(author))
+        message = author
         for i in range(len(diceList)):
             # print dice throw results
-            await channel.send(throwDices(diceList[i]))
+            message += "\n" + throwDices(diceList[i])
+        await channel.send(message)
     else:
         await usage(channel)
 
@@ -96,14 +98,15 @@ async def reroll(message):
         if m.author == message.author:
             if m.content.startswith('/roll'):
                 cleanMessage = m.content[6:]
-                await readCommand(cleanMessage, m.channel)
+                await readRollCommand(cleanMessage, m.channel)
                 break
     await message.channel.send(str(author)+" non riesco a recuperare i tuoi tiri, usa /roll per questa volta")
 
 
 async def readTossCommand(command, channel):
-    await channel.send(str(author))
-    await channel.send(tossCoins(command))
+    message = channel.send(str(author))
+    message += "\n" + tossCoins(command)
+    await channel.send(message)
 
 
 def tossCoins(coin):
