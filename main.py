@@ -6,6 +6,8 @@ import re
 
 client = discord.Client()
 
+author = ""
+
 
 async def usage(channel):
     usage = "```COME USARE IL TOOL\n\t/roll xdY\n\tx è uguale al numero di dadi che si vuole lanciare\n\tY è uguale alle facce del dado da lanciare\n\tEsempio:\n\t/roll 3d6\n\tlancia 3 dadi da 6 facce\n\tOpzionale\n\tè possibile aggiungere un modificatore ad ogni lancio attraverso\n\tsimboli matematici + (addizione) e - (sottrazione)\n\tEsempio\n\t/roll 2d10-1\n\tlancia 2 dadi da 10 facce e sottrai ad ogni risultato 1\n```"
@@ -24,22 +26,24 @@ async def readCommand(command, channel):
 
 
 def validateDiceCommand(count, data):
+    global author
     if int(count) == 0:
         # invalid dice count
-        return "Scusa, non tiro!"
+        return str(author)+" Scusa, non tiro!"
     if int(data.split("+")[0].split("-")[0]) == 0:
-        return "Nessuno sa dove sia il leggendario d0..."
+        return str(author)+" Nessuno sa dove sia il leggendario d0..."
     if int(data.split("+")[0].split("-")[0]) == 1:
-        return "Come si tira un punto?!"
+        return str(author)+" Come si tira un punto?!"
     return None
 
 
 def throwDices(dice):
-    reg = re.search('[0-9]+(d|D)[0-9]+((\+|\-)[0-9]+){0,1}', str(dice))
+    global author
+    reg = re.search('[0-9]+d[0-9]+((\+|\-)[0-9]+){0,1}', str(dice))
     # command validation
     if not reg:
         # invalid dice, cucumber thrown!
-        return "Stai tirando un cetriolo? :cucumber:"
+        return str(author)+" Stai tirando un cetriolo? :cucumber:"
 
     diceCount = dice.split("d")[0]
     diceData = dice.split("d")[1]
@@ -56,7 +60,7 @@ def throwDices(dice):
 
         # additive modifier
         if "+" in diceData:
-            diceModifier = diceModifier.split("+")[1]
+            diceModifier = diceData.split("+")[1]
             # dice throw
             baseValue = random.randint(1, int(diceValue))
             finalValue = baseValue + int(diceModifier)
@@ -72,7 +76,7 @@ def throwDices(dice):
             diceModifier = diceData.split("-")[1]
             # dice throw
             baseValue = random.randint(1, int(diceValue))
-            finalValue = baseValue + int(diceModifier)
+            finalValue = baseValue - int(diceModifier)
             # value limiter
             if finalValue < 1:
                 finalValue = 1
@@ -91,7 +95,19 @@ def throwDices(dice):
             # if baseValue == int(diceValue):
             #     finalValue = str(baseValue) + " :tada:"
             result += str(finalValue) + "\t"
-    return "```d" + diceData + ":   " + result + "```"
+    return str(author)+" ```d" + diceData + ":   " + result + "```"
+
+
+async def reroll(message):
+    global author
+    author = "<@" + str(message.author.id) + ">"
+    async for m in message.channel.history(limit=20):
+        if m.author == message.author:
+            if m.content.startswith('/roll'):
+                cleanMessage = m.content[6:]
+                await readCommand(cleanMessage, m.channel)
+                break
+    await message.channel.send(str(author)+" Non riesco a recuperare i tuoi tiri, usa /roll per questa volta")
 
 
 @client.event
@@ -104,7 +120,13 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if message.content == '/reroll':
+        await reroll(message)
+        return
+
     if message.content.startswith('/roll '):
+        global author
+        author = "<@" + str(message.author.id) + ">"
         cleanMessage = message.content[6:]
         await readCommand(cleanMessage, message.channel)
 
