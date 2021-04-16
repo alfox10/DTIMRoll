@@ -14,10 +14,11 @@ async def usage(channel):
     await channel.send(usage)
 
 
-async def readCommand(command, channel):
+async def readRollCommand(command, channel):
     # divide dice commands
     diceList = command.split(" ")
     if len(diceList) > 0:
+        await channel.send(str(author))
         for i in range(len(diceList)):
             # print dice throw results
             await channel.send(throwDices(diceList[i]))
@@ -29,11 +30,11 @@ def validateDiceCommand(count, data):
     global author
     if int(count) == 0:
         # invalid dice count
-        return str(author)+" Scusa, non tiro!"
+        return "Scusa, non tiro!"
     if int(data.split("+")[0].split("-")[0]) == 0:
-        return str(author)+" Nessuno sa dove sia il leggendario d0..."
+        return "Nessuno sa dove sia il leggendario d0..."
     if int(data.split("+")[0].split("-")[0]) == 1:
-        return str(author)+" Come si tira un punto?!"
+        return "Come si tira un punto?!"
     return None
 
 
@@ -43,7 +44,7 @@ def throwDices(dice):
     # command validation
     if not reg:
         # invalid dice, cucumber thrown!
-        return str(author)+" Stai tirando un cetriolo? :cucumber:"
+        return "Stai tirando un cetriolo? :cucumber:"
 
     diceCount = dice.split("d")[0]
     if diceCount == "":
@@ -69,9 +70,6 @@ def throwDices(dice):
             # value limiter
             if finalValue > int(diceValue):
                 finalValue = int(diceValue)
-            # emoji addition
-            # if finalValue == int(diceValue):
-            #     finalValue = str(finalValue) + " :tada:"
             result += str(finalValue) + " (" + str(baseValue) + ")\t"
         # subtractive modifier
         elif "-" in diceData:
@@ -82,34 +80,41 @@ def throwDices(dice):
             # value limiter
             if finalValue < 1:
                 finalValue = 1
-            # emoji addition
-            # if finalValue == 1:
-            #     finalValue = str(finalValue) + " :skull:"
             result += str(finalValue) + " (" + str(baseValue) + ")\t"
         # no modifier
         else:
             # dice throw
             baseValue = random.randint(1, int(diceData))
             finalValue = baseValue
-            # emoji addition
-            # if baseValue == 1:
-            #     finalValue = str(baseValue) + " :skull:"
-            # if baseValue == int(diceValue):
-            #     finalValue = str(baseValue) + " :tada:"
             result += str(finalValue) + "\t"
-    return str(author)+" ```d" + diceData + ":   " + result + "```"
+    return "```d" + diceData + ":   " + result + "```"
 
 
 async def reroll(message):
     global author
-    author = "<@" + str(message.author.id) + ">"
     async for m in message.channel.history(limit=20):
         if m.author == message.author:
             if m.content.startswith('/roll'):
                 cleanMessage = m.content[6:]
                 await readCommand(cleanMessage, m.channel)
                 break
-    await message.channel.send(str(author)+" Non riesco a recuperare i tuoi tiri, usa /roll per questa volta")
+    await message.channel.send(str(author)+" non riesco a recuperare i tuoi tiri, usa /roll per questa volta")
+
+
+async def readTossCommand(command, channel):
+    await channel.send(str(author))
+    await channel.send(tossCoins(command))
+
+
+def tossCoins(coin):
+    result = ""
+    for i in range(int(coin)):
+        toss = random.randint(1, 2)
+        if toss == 1:
+            result += "testa" + "\t"
+        if toss == 2:
+            result += "croce" + "\t"
+    return "```" + result + "```"
 
 
 @client.event
@@ -119,6 +124,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    global author
+    author = "<@" + str(message.author.id) + ">"
+
     if message.author == client.user:
         return
 
@@ -127,10 +135,12 @@ async def on_message(message):
         return
 
     if message.content.startswith('/roll '):
-        global author
-        author = "<@" + str(message.author.id) + ">"
         cleanMessage = message.content[6:]
-        await readCommand(cleanMessage, message.channel)
+        await readRollCommand(cleanMessage, message.channel)
+
+    if message.content.startswith('/toss'):
+        cleanMessage = message.content[6:]
+        await readTossCommand(cleanMessage, message.channel)
 
 
 keep_alive()
